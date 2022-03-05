@@ -45,8 +45,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     BlocProvider.of<QuoteBloc>(context).add(GetQuoteEvent());
-    BlocProvider.of<TimezoneBloc>(context)
-        .add(GetTimeZoneEvent(timeZoneRegion: timezoneRegion[1]));
+    BlocProvider.of<TimezoneBloc>(context).add(
+      GetTimeZoneEvent(
+        timeZoneRegion: timezoneRegion[1],
+        countryName: countryNameList[1],
+      ),
+    );
     super.initState();
   }
 
@@ -76,8 +80,9 @@ class _HomePageState extends State<HomePage> {
               ),
               onTap: () {
                 BlocProvider.of<QuoteBloc>(context).add(GetQuoteEvent());
-                BlocProvider.of<TimezoneBloc>(context).add(
-                    GetTimeZoneEvent(timeZoneRegion: timezoneRegion[index]));
+                BlocProvider.of<TimezoneBloc>(context).add(GetTimeZoneEvent(
+                    timeZoneRegion: timezoneRegion[index],
+                    countryName: countryNameList[index]));
               },
             );
           },
@@ -96,22 +101,23 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
-                  child: Text(
-                    "${countryNameList[1]}",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                  padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
                   child: BlocConsumer<TimezoneBloc, TimezoneState>(
                     listener: (context, state) {},
                     builder: (context, state) {
                       if (state is TimeZoneSuccessState) {
-                        return Text(
-                          "${state.url["datetime"]}".substring(11, 19),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: 45),
+                        return Column(
+                          children: [
+                            Text(state.country,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 30)),
+                            Text(
+                              "${state.url["datetime"]}".substring(11, 19),
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 45),
+                            ),
+                          ],
                         );
                       } else {
                         return Center(child: CircularProgressIndicator());

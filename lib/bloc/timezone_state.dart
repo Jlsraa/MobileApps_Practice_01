@@ -20,12 +20,11 @@ class TimeZoneErrorState extends TimezoneState {
 
 class TimeZoneSuccessState extends TimezoneState {
   final url;
-  List country = ["Europe/Andorra/"];
-
-  TimeZoneSuccessState({required this.url});
+  final country;
+  TimeZoneSuccessState({required this.url, required this.country});
 
   @override
-  List<Object> get props => [url + country];
+  List<Object> get props => [url, country];
 }
 
 class TimeZoneLoadingState extends TimezoneState {}

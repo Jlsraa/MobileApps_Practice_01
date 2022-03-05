@@ -20,7 +20,7 @@ class TimezoneBloc extends Bloc<TimezoneEvent, TimezoneState> {
     try {
       if (data != null) {
         emitState(
-          TimeZoneSuccessState(url: data),
+          TimeZoneSuccessState(url: data, country: event.props[1]),
         );
       } else {
         throw Exception();
