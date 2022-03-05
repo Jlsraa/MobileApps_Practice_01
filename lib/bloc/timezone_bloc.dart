@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -12,9 +13,10 @@ class TimezoneBloc extends Bloc<TimezoneEvent, TimezoneState> {
     on<TimezoneEvent>(_getApiData);
   }
 
-  void _getApiData(TimezoneEvent event, Emitter emitState) async {
+  void _getApiData(
+      TimezoneEvent event, Emitter<TimezoneState> emitState) async {
     emitState(TimeZoneLoadingState());
-    var data = await _getTimeZoneData();
+    var data = await _getTimeZoneData(event.props[0]);
     try {
       if (data != null) {
         emitState(
@@ -33,10 +35,10 @@ class TimezoneBloc extends Bloc<TimezoneEvent, TimezoneState> {
     }
   }
 
-  Future _getTimeZoneData() async {
-    Response response = await get(
-        Uri.parse('http://worldtimeapi.org/api/timezone/Europe/Andorra/'));
+  Future _getTimeZoneData(region) async {
+    String _timeZoneData = 'http://worldtimeapi.org/api/timezone/${region}/';
     try {
+      Response response = await get(Uri.parse(_timeZoneData));
       if (response.statusCode == 200) {
         var result = jsonDecode(response.body);
         return result;

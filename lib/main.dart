@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:practica_01/bloc/timezone_bloc.dart';
 import 'package:practica_01/home_page.dart';
 
-import 'bloc/bloc/quote_bloc.dart';
+import 'bloc/quote_bloc.dart';
 
 void main() => runApp(MyApp());
 

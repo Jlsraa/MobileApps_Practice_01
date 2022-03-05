@@ -4,8 +4,8 @@ import 'package:backdrop/backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:practica_01/bloc/bloc/quote_bloc.dart';
 import 'package:http/http.dart';
+import 'package:practica_01/bloc/quote_bloc.dart';
 import 'package:practica_01/bloc/timezone_bloc.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,20 +17,36 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List countryNameList = ["Andorra", "Mexico", "Peru", "Canada", "Argentina"];
-  List flagList = ["ad", "mx", "pe", "ca", "ar"];
+  List flagList = [
+    "https://flagcdn.com/32x24/ad.png",
+    "https://flagcdn.com/32x24/mx.png",
+    "https://flagcdn.com/32x24/pe.png",
+    "https://flagcdn.com/32x24/ca.png",
+    "https://flagcdn.com/32x24/ar.png",
+  ];
+  List timezoneRegion = [
+    "Europe/Andorra",
+    "America/Mexico_City",
+    "America/Lima",
+    "America/Vancouver",
+    "America/Argentina/Buenos_Aires"
+  ];
+  List flagFiles = [];
 
   getCountryImages() async {
     for (int i = 0; i < flagList.length; i++) {
       var flagUrl = await get(
         Uri.parse('https://flagcdn.com/32x24/${flagList[i]}.png'),
       );
+      flagFiles.add(flagUrl.bodyBytes);
     }
   }
 
   @override
   void initState() {
     BlocProvider.of<QuoteBloc>(context).add(GetQuoteEvent());
-    BlocProvider.of<TimezoneBloc>(context).add(GetTimeZoneEvent());
+    BlocProvider.of<TimezoneBloc>(context)
+        .add(GetTimeZoneEvent(timeZoneRegion: timezoneRegion[1]));
     super.initState();
   }
 
@@ -46,13 +62,22 @@ class _HomePageState extends State<HomePage> {
           itemCount: 5,
           itemBuilder: (BuildContext context, int index) {
             return ListTile(
-              leading: Text(flagList[index]),
+              leading: ClipRRect(
+                child: Container(
+                  child: Image(
+                      image: NetworkImage(
+                    flagList[index],
+                  )),
+                ),
+              ),
               title: Text(
                 countryNameList[index],
                 style: TextStyle(color: Colors.white, fontSize: 20),
               ),
               onTap: () {
                 BlocProvider.of<QuoteBloc>(context).add(GetQuoteEvent());
+                BlocProvider.of<TimezoneBloc>(context).add(
+                    GetTimeZoneEvent(timeZoneRegion: timezoneRegion[index]));
               },
             );
           },
@@ -69,66 +94,75 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Column(
-                  children: [
-                    BlocConsumer<TimezoneBloc, TimezoneState>(
-                        builder: (context, state) {
-                      return Text("HORA");
-                    }, listener: (context, state) {
-                      if (state is TimeZoneErrorState) {
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 40, 0, 0),
+                  child: Text(
+                    "${countryNameList[1]}",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                  child: BlocConsumer<TimezoneBloc, TimezoneState>(
+                    listener: (context, state) {},
+                    builder: (context, state) {
+                      if (state is TimeZoneSuccessState) {
+                        return Text(
+                          "${state.url["datetime"]}".substring(11, 19),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 45),
+                        );
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 130, 0, 30),
+                  child: BlocConsumer<QuoteBloc, QuoteState>(
+                    listener: (context, state) {
+                      if (state is QuoteErrorState) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text("${state.errorMsg}"),
                           ),
                         );
                       }
-                    }),
-                  ],
-                ),
-                BlocConsumer<QuoteBloc, QuoteState>(
-                  listener: (context, state) {
-                    if (state is QuoteErrorState) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("${state.errorMsg}"),
-                        ),
-                      );
-                    }
-                  },
-                  builder: (context, state) {
-                    if (state is QuoteSuccessState) {
-                      return ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        itemCount: 1,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: ListTile(
-                                title: Text(
-                                  state.url[index]["q"],
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 25),
-                                ),
-                                subtitle: Text(
-                                  "- ${state.url[index]["a"]}",
-                                  style: TextStyle(
-                                      color: Colors.white70, fontSize: 20),
-                                  textAlign: TextAlign.right,
+                    },
+                    builder: (context, state) {
+                      if (state is QuoteSuccessState) {
+                        return ListView.builder(
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemCount: 1,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: ListTile(
+                                  title: Text(
+                                    state.url[index]["q"],
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 25),
+                                  ),
+                                  subtitle: Text(
+                                    "- ${state.url[index]["a"]}",
+                                    style: TextStyle(
+                                        color: Colors.white70, fontSize: 20),
+                                    textAlign: TextAlign.right,
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
-                      );
-                    } else {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                  },
+                            );
+                          },
+                        );
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  ),
                 ),
               ],
             ),

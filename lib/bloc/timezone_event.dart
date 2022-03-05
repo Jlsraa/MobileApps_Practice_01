@@ -7,4 +7,11 @@ abstract class TimezoneEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetTimeZoneEvent extends TimezoneEvent {}
+class GetTimeZoneEvent extends TimezoneEvent {
+  final String timeZoneRegion;
+
+  GetTimeZoneEvent({required this.timeZoneRegion});
+
+  @override
+  List<Object> get props => [this.timeZoneRegion];
+}
