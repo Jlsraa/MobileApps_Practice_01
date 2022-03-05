@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:practica_01/bloc/background_image_bloc.dart';
 import 'package:practica_01/bloc/timezone_bloc.dart';
 import 'package:practica_01/home_page.dart';
 
@@ -21,6 +22,9 @@ class MyApp extends StatelessWidget {
           BlocProvider<TimezoneBloc>(
             create: (context) => TimezoneBloc(),
           ),
+          BlocProvider<BackgroundImageBloc>(
+            create: (context) => BackgroundImageBloc(),
+          )
         ],
         child: HomePage(),
       ),
