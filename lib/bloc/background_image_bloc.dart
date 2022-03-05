@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart';
-
+import 'dart:math';
 part 'background_image_event.dart';
 part 'background_image_state.dart';
 
@@ -18,8 +18,10 @@ class BackgroundImageBloc
     var data = await _getImageData();
     try {
       if (data != null) {
+        print(data[0]["download_url"]);
         emitState(
-          BackgroundImageSuccessState(url: data),
+          BackgroundImageSuccessState(
+              url: data[Random().nextInt(30)]["download_url"]),
         );
       } else {
         throw Exception();
